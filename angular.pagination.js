@@ -2,7 +2,6 @@
  * 分页类
  * end to first : 向前
  * first to end : 向后
- * pageNum从0开始，第一页直接调用next()
  * Created by yyam on 15-6-25.
  */
 function AngularPagination(uri, pageNum, pageSize) {
@@ -20,6 +19,8 @@ function AngularPagination(uri, pageNum, pageSize) {
      * 数据地址
      */
     this.uri = uri;
+
+    this.keyword = undefined;
 
     /**
      * 后端响应的总页数
@@ -57,31 +58,65 @@ function AngularPagination(uri, pageNum, pageSize) {
      */
     this.toEnd = false;
 
+    this.$http = null;
+
+    this.params = null;
+
     /**
      * 下一页数据
      */
-    this.next = function($http) {
+    this.next = function() {
         this.pageNum = this.pageNum + 1;
-        return this.current($http);
+        return this.current();
     };
 
     /**
      * 上一页数据
      * @param $http
      */
-    this.previous = function($http) {
+    this.previous = function() {
         this.pageNum = this.pageNum - 1;
-        return this.current($http);
+        return this.current();
     };
 
-    /**
-     * 跳到指定页面
-     * @param $http
-     * @param pageNum 并不会检查有效性
-     */
-    this.go = function($http, pageNum) {
+    this.goto = function(pageNum) {
+        if(pageNum > this.pages) {
+            return;
+        }
         this.pageNum = pageNum;
-        return this.current($http);
+        return this.current();
+    }
+
+    /**
+     * 搜索框/搜索按钮
+     * 自动跳到第一页
+     * @param event 搜索框的回车事件
+     */
+    this.search = function(event) {
+        if(event) {
+            if(event.keyCode != 13) {
+                return;
+            }
+        }
+        this.goto(1);
+    };
+
+    this.first = function() {
+        this.goto(1);
+    };
+
+    this.end = function() {
+        this.goto(this.pages);
+    };
+
+    this.go = function(event) {
+        if(event) {
+            if(event.keyCode != 13) {
+                return;
+            }
+            var pageNum = event.target.value;
+            return this.goto(pageNum);
+        }
     };
 
     /**
@@ -89,9 +124,16 @@ function AngularPagination(uri, pageNum, pageSize) {
      * @param $http
      * @returns {*}
      */
-    this.current = function($http) {
+    this.current = function() {
         var self = this;
-        return $http.get(this.uri + '?pageNum=' + this.pageNum + '&pageSize=' + this.pageSize).then(function(response) {
+        var url = this.uri;
+        this.params = {};
+        this.params['pageNum'] = this.pageNum;
+        this.params['pageSize'] = this.pageSize;
+        if(this.keyword) {
+            this.params['keyword'] = this.keyword;
+        }
+        return this.$http.post(url, this.params).then(function(response) {
             self.config = response.data;
             self.pages = self.config.pages;
             self.total = self.config.total;
