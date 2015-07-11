@@ -2,7 +2,7 @@
  * 分页类
  * end to first : 向前
  * first to end : 向后
- * Created by yyam on 15-6-25.
+ * Created by ilaipi on 15-6-25.
  */
 function AngularPagination(uri, pageNum, pageSize) {
     /**
