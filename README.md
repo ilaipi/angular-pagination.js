@@ -2,6 +2,7 @@
 a pagination class use angular `$http.post` to request data
 
 Usage:
+
 1. create instance
 ```
   var pageNum = 1;//the first page num, usually is 1 I think
@@ -16,6 +17,7 @@ Usage:
       'ui.router', 'ui.bootstrap', 'angular-highlight'
   ]);
 ```
+
 3.create a service
 ```
   myApp.factory('barService', [function () {
@@ -53,7 +55,7 @@ Usage:
   }]);
 ```
 
-5.use in your view
+6.use in your view
 ```
   <div class="col-lg-4">
     <div class="input-group">
